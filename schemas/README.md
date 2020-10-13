@@ -40,5 +40,7 @@ We intend to find a solution to merge the two in the future.
 This is the Avro schema meant to describe the alerts based on telescope source, augmented with the various Fink science modules
 
 Every contribution of the Fink schema is assigned a version id (incuding the telescope one, which is provided by the telescope itself).
-The assembled Fink schema receives a Fink version id and described n the 'Fink_M.m.conf' file.
+The assembled Fink schema receives a Fink version id and described n the ``Fink_M.m.conf`` file.
+
+Contributions exist as source/<name>_M.m.avsc files
 
