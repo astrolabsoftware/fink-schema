@@ -1,0 +1,4 @@
+    {
+      'name': 'timestamp',
+      'type': ['string', 'null']
+    },

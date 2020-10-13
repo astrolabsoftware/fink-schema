@@ -35,65 +35,10 @@ schema_name_XpY-live.avsc --> suitable for live data
 
 We intend to find a solution to merge the two in the future.
 
-## Troubleshooting
+# Construction of the Fink oriented schema.
 
-Using a wrong schema to decode alerts will lead to failures. Typically broker users will see this message:
+This is the Avro schema meant to describe the alerts based on telescope source, augmented with the various Fink science modules
 
-```bash
-Caused by: org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0, localhost, executor driver): java.lang.ArrayIndexOutOfBoundsException: -28
+Every contribution of the Fink schema is assigned a version id (incuding the telescope one, which is provided by the telescope itself).
+The assembled Fink schema receives a Fink version id and described n the 'Fink_M.m.conf' file.
 
-	at org.apache.avro.io.parsing.Symbol$Alternative.getSymbol(Symbol.java:424)
-
-	at org.apache.avro.io.ResolvingDecoder.doAction(ResolvingDecoder.java:290)
-
-	at org.apache.avro.io.parsing.Parser.advance(Parser.java:88)
-
-	at org.apache.avro.io.ResolvingDecoder.readIndex(ResolvingDecoder.java:267)
-
-	at org.apache.avro.generic.GenericDatumReader.readWithoutConversion(GenericDatumReader.java:179)
-	...
-```
-
-and fink-client users could see:
-
-```bash
-In [3]: topic, alert = consumer.poll(timeout=1)
----------------------------------------------------------------------------
-UnicodeDecodeError                        Traceback (most recent call last)
-<ipython-input-4-d5d6e0affb36> in <module>
-----> 1 topic, alert = consumer.poll(timeout=ts)
-
-~/Documents/workspace/myrepos/fink-client/fink_client/consumer.py in poll(self, timeout)
-     92         topic = msg.topic()
-     93         avro_alert = io.BytesIO(msg.value())
----> 94         alert = _decode_avro_alert(avro_alert, self._parsed_schema)
-     95
-     96         return topic, alert
-
-~/Documents/workspace/myrepos/fink-client/fink_client/consumer.py in _decode_avro_alert(avro_alert, schema)
-    234     """
-    235     avro_alert.seek(0)
---> 236     return fastavro.schemaless_reader(avro_alert, schema)
-
-fastavro/_read.pyx in fastavro._read.schemaless_reader()
-
-fastavro/_read.pyx in fastavro._read.schemaless_reader()
-
-fastavro/_read.pyx in fastavro._read._read_data()
-
-fastavro/_read.pyx in fastavro._read.read_record()
-
-fastavro/_read.pyx in fastavro._read._read_data()
-
-fastavro/_read.pyx in fastavro._read.read_union()
-
-fastavro/_read.pyx in fastavro._read._read_data()
-
-fastavro/_read.pyx in fastavro._read.read_utf8()
-
-fastavro/_six.pyx in fastavro._six.py3_btou()
-
-UnicodeDecodeError: 'utf-8' codec can't decode byte 0xc2 in position 13: invalid continuation byte
-```
-
-Check you are using the relevant schema version according to the data you are processing. In fink-broker, you can always output the schema of an alert before it is sent by the broker using [get_kafka](https://github.com/astrolabsoftware/fink-broker/blob/master/fink_broker/distributionUtils.py#L29) and compare then to the schema you were using.
